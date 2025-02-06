@@ -4,11 +4,16 @@ import dotenv
 import pytest
 
 
-@pytest.fixture(autouse=True)
+pytest_plugins = [
+    'tests.fixtures'
+]
+
+
+@pytest.fixture(scope="session", autouse=True)
 def envs():
     dotenv.load_dotenv()
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def app_url():
     return os.getenv("APP_URL")
