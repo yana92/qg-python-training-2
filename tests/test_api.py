@@ -1,35 +1,10 @@
-import json
 import math
 
 import requests
 
 from http import HTTPStatus
-from pytest import mark, fixture
+from pytest import mark
 from app.models.User import Users, User, UserUpdate
-
-
-@fixture(scope="module")
-def fill_test_data(app_url) -> list[int]:
-    with open("users.json") as f:
-        test_data_users = json.load(f)
-    api_users = []
-    for user in test_data_users:
-        response = requests.post(f"{app_url}/api/users/", json=user)
-        api_users.append(response.json())
-
-    user_ids = [user["id"] for user in api_users]
-
-    yield user_ids
-
-    for user_id in user_ids:
-        requests.delete(f"{app_url}/api/users/{user_id}")
-
-
-@fixture
-def users(app_url):
-    response = requests.get(f"{app_url}/api/users/")
-    assert response.status_code == HTTPStatus.OK
-    return response.json()
 
 
 @mark.usefixtures("fill_test_data")
@@ -144,7 +119,7 @@ class TestGetUser:
         response = requests.get(f"{app_url}/api/users/{user_id}")
         assert response.status_code == HTTPStatus.NOT_FOUND
 
-    @mark.parametrize("user_id", [-1, 0, "fafaf"])
+    @mark.parametrize("user_id", [-1, 0, "text"])
     def test_user_invalid_values(self, app_url, user_id):
         response = requests.get(f"{app_url}/api/users/{user_id}")
         assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
@@ -227,7 +202,7 @@ class TestPatchUser:
         )
         assert response.status_code == HTTPStatus.NOT_FOUND
 
-    @mark.parametrize("user_id", [-1, 0, "fafaf"])
+    @mark.parametrize("user_id", [-1, 0, "text"])
     def test_patch_user_invalid_values(self, app_url, user_id):
         response = requests.patch(f"{app_url}/api/users/{user_id}",
                                   json={'first_name': 'new name'})
