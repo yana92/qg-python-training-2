@@ -8,7 +8,7 @@ def test_status(app_url):
     response = requests.get(f'{app_url}/status')
     assert response.status_code == HTTPStatus.OK, \
         f'Неожиданный код ответа, ошибка {response.text}'
-    assert response.json()['users'] is True
+    assert response.json()['database'] is True
 
 
 def test_get_users(app_url):
